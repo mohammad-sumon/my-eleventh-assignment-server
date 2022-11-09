@@ -17,6 +17,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
         const serviceCollection = client.db('kitchenReview').collection('services');
+        const reviewCollection = client.db('kitchenReview').collection('myReviews');
 
         // Home page 3 services will be display
         app.get('/services', async(req, res) => {
@@ -34,11 +35,31 @@ async function run(){
             res.send(services);
         });
 
+        // to get specific id for dynamic route
         app.get('/allServices/:id', async(req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const service = await serviceCollection.findOne(query);
             res.send(service);
+        });
+
+        // reviews api
+        app.get('/myReviews', async (req, res) => {
+            let query = {};
+            if(req.query.email){
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        });
+
+        app.post('/myReviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
         })
     }
     finally{
