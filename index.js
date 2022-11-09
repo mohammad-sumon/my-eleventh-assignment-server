@@ -62,6 +62,15 @@ async function run(){
             res.send(result);
         });
 
+        // to add service
+        app.post('/addServices', async (req, res) => {
+            const service = req.body;
+            console.log(service);
+            const result = await serviceCollection.insertOne(service);
+            res.send(result);
+        })
+
+        // for delete review
         app.delete('/myReviews/:id', async(req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
